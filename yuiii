@@ -1,0 +1,67 @@
+import React from 'react';
+import { WppTypography, WppCheckbox, WppFileUpload } from '@platform-ui-kit/components-library-react';
+
+type Props = {
+  checked: boolean;
+  onChange: (value: boolean) => void;
+  title: string;
+  Links: { label: string; link: string; context: string }[];
+  handleFileUploadChange: (value: any) => void;
+  checkboxText: string;
+};
+
+export const UploadFilesStep = (props: Props) => {
+  
+  function handleFileUploadChange(event: any): void {
+    const file = event.target.files[0];
+    const fileExtension = file?.name.split('.').pop().toLowerCase(); // Get the file extension
+    
+    // Allowed extensions for SPSS and Excel files
+    const allowedExtensions = ['xls', 'xlsx', 'sav', 'zsav'];
+
+    // Check if the file extension is allowed
+    if (file && allowedExtensions.includes(fileExtension)) {
+      console.log('Uploading file: ', file);
+      props.handleFileUploadChange(file); // Pass the file to the parent handler
+    } else {
+      console.warn('Only SPSS (.sav, .zsav) or Excel (.xls, .xlsx) files are allowed!');
+    }
+  }
+
+  return (
+    <div>
+      {/* Title Section */}
+      <WppTypography type="l-body">
+        <div style={{ marginBottom: '1rem' }}>
+          <h3>{props.title}</h3>
+        </div>
+      </WppTypography>
+
+      {/* Links Rendering */}
+      <ul>
+        {props.Links.map((item, index) => (
+          <li key={index}>
+            {item.context}: <a href={item.link} target="_blank">{item.label}</a>
+          </li>
+        ))}
+      </ul>
+
+      {/* File Upload Component with custom file type validation */}
+      <WppFileUpload 
+        onChange={handleFileUploadChange} // Custom handler for file validation
+      />
+
+      {/* Checkbox Component */}
+      <WppCheckbox
+        style={{ padding: '5px' }}
+        required={true}
+        checked={props.checked}
+        indeterminate={false}
+        labelConfig={{
+          text: props.checkboxText,
+        }}
+        onWppChange={(e: CustomEvent) => props.onChange(e.detail.checked)}
+      />
+    </div>
+  );
+};
